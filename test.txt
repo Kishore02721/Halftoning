@@ -1,0 +1,29 @@
+import torch
+from PIL import Image
+import matplotlib.pyplot as plt
+from model import UNetGenerator
+from torchvision import transforms
+
+# Load the trained model
+model = UNetGenerator().to(device)
+model.load_state_dict(torch.load('generator_epoch_94.pth'))  # Replace X with the epoch number you want to load
+model.eval()
+
+# Example image for inference (use a dull image)
+image_path = 'dull_image.bmp'  # Path to a dull image
+image = Image.open(image_path).convert('RGB')
+
+# Preprocess the image
+transform = transforms.Compose([
+    transforms.Resize((256, 256)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+])
+image_tensor = transform(image).unsqueeze(0).to(device)  # Add batch dimension and move to device
+
+# Inference
+with torch.no_grad():
+    output = model(image_tensor)
+
+# Post-process and visualize the output
+output_image = output.squeeze# train.py
